@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Reflex Challenge</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #1c1c1c; /* Dark background */
+      font-family: Arial, sans-serif;
+      overflow: hidden; /* Prevent scrollbars */
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    .message {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #fff; /* White text */
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+
+    .button {
+      padding: 20px 40px;
+      background-color: #00bfff;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+      box-shadow: 0 0 10px rgba(0, 191, 255, 0.7);
+    }
+
+    .button:hover {
+      background-color: #007acc;
+      transform: scale(1.1); /* Slightly grow on hover */
+      box-shadow: 0 0 20px rgba(0, 191, 255, 1); /* Brighter glow on hover */
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .score-display {
+      font-size: 1.5rem;
+      margin-top: 20px;
+      color: #fff; /* White text */
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+
+    .share-button {
+      padding: 10px 20px;
+      background-color: #1DA1F2;
+      color: white;
+      font-size: 1.2rem;
+      margin-top: 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+      box-shadow: 0 0 10px rgba(29, 161, 242, 0.7);
+    }
+
+    .share-button:hover {
+      background-color: #007acc;
+      transform: scale(1.1); /* Slightly grow on hover */
+      box-shadow: 0 0 20px rgba(29, 161, 242, 1); /* Brighter glow on hover */
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.7); }
+      50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+      100% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.7); }
+    }
+
+    .glow {
+      animation: glow 1.5s infinite alternate; /* Glowing effect */
+    }
+
+    /* Mobile adjustments */
+    @media only screen and (max-width: 600px) {
+      .message {
+        font-size: 1.5rem;
+      }
+
+      .button {
+        font-size: 1.5rem;
+        padding: 15px 30px;
+      }
+
+      .score-display {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="message" class="message glow">How fast is your reflex arc!<br>Let's play! </div>
+  <button id="action-button" class="button">Start</button>
+  <div id="score" class="score-display hidden"></div>
+  <button id="share-button" class="share-button hidden">Share on X<br>Invite more challengers!</button>
+  <div id="follow-message" class="hidden">
+    <p style="color: #fff;">Follow me for more challenges: 
+      <a href="https://x.com/DamnKampala?t=0clp0psKrR7cU8LZcv70yQ&s=09" target="_blank" style="color: #1DA1F2;">@DamnKampala</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  let startTime;
+  let timeout;
+  let gameStarted = false;
+  let greenLightOn = false;
+  let reactionTimeout;
+
+  const messageElement = document.getElementById('message');
+  const actionButton = document.getElementById('action-button');
+  const scoreDisplay = document.getElementById('score');
+  const shareButton = document.getElementById('share-button');
+  const followMessage = document.getElementById('follow-message');
+
+  actionButton.addEventListener('click', () => {
+    if (!gameStarted) {
+      startGame();
+    } else if (greenLightOn) {
+      checkReaction();
+    } else {
+      earlyClick();
+    }
+  });
+
+  function startGame() {
+    gameStarted = true;
+    greenLightOn = false;
+    messageElement.textContent = 'Waiting......';
+    actionButton.textContent = '...';
+
+    // Random delay between 2-5 seconds (2000ms to 5000ms)
+    const delay = Math.floor(Math.random() * 3000) + 2000;
+    
+    timeout = setTimeout(() => {
+      greenLightOn = true;
+      messageElement.textContent = 'Go!';
+      startTime = new Date().getTime();
+      actionButton.textContent = 'Tap!';
+      
+      // Set a 2-second window for the player to react
+      reactionTimeout = setTimeout(() => {
+        if (greenLightOn) {
+          tooLate();
+        }
+      }, 2000); // 2 seconds to tap
+    }, delay);
+  }
+
+  function checkReaction() {
+    const reactionTime = new Date().getTime() - startTime;
+    gameStarted = false;
+    greenLightOn = false;
+    clearTimeout(timeout);
+    clearTimeout(reactionTimeout);
+
+    messageElement.textContent = `Your reaction time: ${reactionTime}ms`;
+    scoreDisplay.textContent = `Your score: ${reactionTime}ms`;
+    scoreDisplay.classList.remove('hidden');
+    shareButton.classList.remove('hidden');
+    followMessage.classList.remove('hidden');
+    actionButton.textContent = 'Play Again';
+  }
+
+  function earlyClick() {
+    messageElement.textContent = 'Too soon! Wait a little bit.';
+    gameStarted = false;
+    greenLightOn = false;
+    clearTimeout(timeout);
+    clearTimeout(reactionTimeout);
+    actionButton.textContent = 'Try Again';
+    scoreDisplay.classList.add('hidden');
+    shareButton.classList.add('hidden');
+    followMessage.classList.add('hidden');
+  }
+
+  function tooLate() {
+    gameStarted = false;
+    greenLightOn = false;
+    messageElement.textContent = 'Too slow! You didn\'t react in time.';
+    actionButton.textContent = 'Try Again';
+    scoreDisplay.classList.add('hidden');
+    shareButton.classList.add('hidden');
+    followMessage.classList.add('hidden');
+  }
+
+  // Share score on X
+  shareButton.addEventListener('click', () => {
+    const text = `I just got a reaction time of ${scoreDisplay.textContent.split(": ")[1]} in the Quick Reflex Challenge! Can you beat my score? Play here: `;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(twitterUrl, '_blank');
+  });
+  
+  
+</script>
+
+</body>
+</html>
