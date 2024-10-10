@@ -203,7 +203,7 @@
 
   // Share score on X
   shareButton.addEventListener('click', () => {
-    const text = `I just got a reaction time of ${scoreDisplay.textContent.split(": ")[1]} in the Quick Reflex Challenge! Can you beat my score? Play here: `;
+    const text = `I just got a reaction time of ${scoreDisplay.textContent.split(": ")[1]} in the Quick Reflex Challenge! Can you beat my score? Play here: https://shr.link/njq38`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(twitterUrl, '_blank');
   });
